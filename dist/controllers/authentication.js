@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.login = exports.register = void 0;
 const helpers_1 = require("../helpers");
 const users_1 = require("../models/users");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const register = async (req, res) => {
     try {
         const { email, password, fullName } = req.body;
@@ -42,7 +46,7 @@ const login = async (req, res) => {
         }
         const user = await users_1.UserModel.findOne({ email }).select("+authentication.salt +authentication.password"); // mongo chỉ trả ra các trường có select: true định nghĩa trong schema (mà passwod với salt đang để là select: false(trong users model) nên là phải dùng select('') để lấy ra nó)
         if (!user) {
-            res.status(400).send("Email not found !");
+            res.status(400).send("Email not register ! Please register before login");
             return;
         }
         const passwordHash = (0, helpers_1.authentication)(user.authentication.salt, password);
@@ -50,7 +54,22 @@ const login = async (req, res) => {
             res.status(400).send("Password is not correct !");
             return;
         }
-        res.status(200).send("Login successful !");
+        // Tạo token
+        const token = jsonwebtoken_1.default.sign({ id: user._id, email: user.email }, // Payload
+        process.env.JWT_SECRET, // Secret key
+        { expiresIn: "1h" } // Thời gian hết hạn
+        );
+        res.status(200).json({
+            message: "Login successful",
+            data: {
+                userInformation: {
+                    id: user.id,
+                    email: user.email,
+                    fullName: user.fullName,
+                },
+                accessToken: token,
+            },
+        });
     }
     catch (error) {
         res.sendStatus(400);
