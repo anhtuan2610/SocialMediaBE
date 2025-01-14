@@ -13,7 +13,7 @@ export const getLoggedInUserInfo = async (
   res: express.Response
 ) => {
   try {
-    const id = req.user.id;
+    const id = req.user.id; // detected từ jwt ra (user: {email, id} nên phải custom lại kiểu req)
     if (!id) {
       res.status(400).send("User ID Not Found!");
       return;

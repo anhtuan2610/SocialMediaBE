@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
-    fullName: { type: String, require: true },
-    email: { type: String, unique: true, require: true },
-    avatar: { type: String, require: false },
+    fullName: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
+    avatar: { type: String, default: null },
     authentication: {
-      password: { type: String, require: true, select: false },
+      password: { type: String, required: true, select: false },
       salt: { type: String, select: false },
       sessionToken: { type: String, select: false },
     },

@@ -25,14 +25,17 @@ app.use(bodyParser.json());
 
 const server = http.createServer(app);
 const PORT = process.env.PORT || 8000;
-const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://animals26102002:26102002@cluster0.kudat.mongodb.net/SocialMediaDb?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URL =
+  process.env.MONGO_URL ||
+  "mongodb+srv://animals26102002:26102002@cluster0.kudat.mongodb.net/SocialMediaDb?retryWrites=true&w=majority&appName=Cluster0";
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}/`);
 });
 
 mongoose.Promise = Promise;
-mongoose.connect(MONGO_URL)
+mongoose
+  .connect(MONGO_URL)
   .then(() => {
     console.log("Successfully connected to MongoDB Atlas");
   })
@@ -41,6 +44,6 @@ mongoose.connect(MONGO_URL)
   });
 mongoose.connection.on("error", (error: Error) => console.log(error));
 
-app.use("/", router());
+app.use("/api", router());
 
 export default app;
