@@ -62,7 +62,7 @@ export const login = async (req: express.Request, res: express.Response) => {
     const token = jwt.sign(
       { id: user._id, email: user.email }, // Payload
       process.env.JWT_SECRET as string, // Secret key
-      { expiresIn: "1h" } // Thời gian hết hạn
+      { expiresIn: "24h" } // Thời gian hết hạn
     );
 
     res.status(200).json({

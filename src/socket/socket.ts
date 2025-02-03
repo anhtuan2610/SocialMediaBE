@@ -17,15 +17,19 @@ export const configureSocket = (server: http.Server) => {
 
     socket.on("joinChatRooms", (roomIds) => {
       roomIds.forEach((roomId: string) => {
-        console.log(socket.id + " join room chat: " + roomId);
         socket.join(roomId);
       });
-      roomIds.forEach((roomId: string) => {
-        io.to(roomId).emit("userJoined", {
-          message: `A user with socketId ${socket.id} joined room ${roomId}`,
-        });
-      });
     });
+
+    socket.on("sendMessage", (roomId, senderId, content) => {
+      io.to(roomId).emit("receiveMessage", {
+        message: `${socket.id} send to members in room id ${roomId} message ${content}`,
+        data: {
+          senderId,
+          content
+        }
+      })
+    })
 
     socket.on("disconnect", () => {
       console.log("User disconnected! socketId: ", socket.id);

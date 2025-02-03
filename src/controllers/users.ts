@@ -34,3 +34,25 @@ export const getLoggedInUserInfo = async (
     return;
   }
 };
+
+export const getProfileInfo = async (req: express.Request, res: express.Response) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      res.status(400).send("User ID Not Found!");
+      return;
+    }    
+    const info = await UserModel.findById(userId);
+    if (!info) {
+      res.status(400).send("User ID Not Found!");
+      return;
+    }
+    console.log(info);
+    
+    res.status(200).json({ message: "Get user information success !", data: {info} });
+    return;
+  } catch (error) {
+    res.status(500).send("An error occurred while fetching user info.");
+    return;
+  }
+};

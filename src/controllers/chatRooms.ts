@@ -22,6 +22,7 @@ export const getAllChatRoomByUserId = async (
 ) => {
   try {
     const id = req.user.id;
+    const searchString = req.query.searchString?.toString() || "";
     if (!id) {
       res.status(400).send("User ID Missing.");
       return;
@@ -52,9 +53,14 @@ export const getAllChatRoomByUserId = async (
         chatRoom.name = otherMember.fullName;
       }
     });
+    const filterChatRooms = listChatRooms.filter((chatRoom) =>
+      chatRoom.name
+        .toLocaleLowerCase()
+        .includes(searchString.toLocaleLowerCase())
+    );
     res.status(200).json({
       message: "Find All Chat Room Success.",
-      data: listChatRooms,
+      data: filterChatRooms,
     });
   } catch (error) {
     res.status(500).send("An error occurred while fetching chat room.");

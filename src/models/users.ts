@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema(
       salt: { type: String, select: false },
       sessionToken: { type: String, select: false },
     },
+    bio: { type: String, default: null },
   },
   { timestamps: true }
 );

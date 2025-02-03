@@ -44,20 +44,31 @@ export const getAllMessageByRoomId = async (
 ) => {
   try {
     const { roomId } = req.params;
+    const { skipMessageCount, limit } = req.query;
+    const skipNumber = parseInt(skipMessageCount as string) || 0;
+    const limitNumber = parseInt(limit as string) || 15;
     if (!roomId) {
       res.status(400).send("Missing room id");
       return;
     }
-    const listMessages = await MessageModel.find({ chatRoom: roomId }).select(
-      "-chatRoom"
-    );
+    const totalMessage = await MessageModel.countDocuments({
+      chatRoom: roomId,
+    });
+    const listMessages = await MessageModel.find({ chatRoom: roomId })
+      .select("-chatRoom")
+      .sort({ _id: -1 })
+      .skip(skipNumber)
+      .limit(limitNumber);
     if (!listMessages) {
       res.status(404).send("Not found any message in chat room.");
       return;
     }
     res.status(200).json({
       message: "Get List Messages Success !",
-      data: listMessages,
+      data: {
+        listMessages: listMessages.reverse(),
+        totalMessage: totalMessage,
+      },
     });
     return;
   } catch (error) {
