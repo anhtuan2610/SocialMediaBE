@@ -1,10 +1,13 @@
-import express from "express"
+import express from "express";
 
-import { getLoggedInUserInfo, getProfileInfo } from "../controllers/users"
+import { getLoggedInUserInfo, getProfileInfo } from "../controllers/users";
 import { authenticateToken } from "../middlewares/index";
 
 export default (router: express.Router): void => {
-    router.use(authenticateToken)
-    router.get("/users/get-info", getLoggedInUserInfo);
-    router.get("/users/get-profile-info/:userId", getProfileInfo);
-}
+  router.get("/users/get-info", authenticateToken, getLoggedInUserInfo);
+  router.get(
+    "/users/get-profile-info/:userId",
+    authenticateToken,
+    getProfileInfo
+  );
+};

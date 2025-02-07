@@ -26,6 +26,7 @@ app.use(bodyParser.json());
 
 const server = http.createServer(app);
 configureSocket(server);
+
 const PORT = process.env.PORT || 8000;
 const MONGO_URL =
   process.env.MONGO_URL ||

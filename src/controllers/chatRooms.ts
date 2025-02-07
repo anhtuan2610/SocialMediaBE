@@ -102,7 +102,7 @@ export const getChatRoomInfo = async (
   res: express.Response
 ) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     if (!id) {
       res.status(400).send("Not found chat room id.");
       return;
@@ -123,6 +123,35 @@ export const getChatRoomInfo = async (
     res
       .status(500)
       .send("An error occurred while fetch chat room information.");
+    return;
+  }
+};
+
+export const getChatRoomId = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { userId1, userId2 } = req.query;
+    if (!userId1 || !userId2) {
+      res.status(400).send("Missing user id");
+      return;
+    }
+    const chatRoom = await ChatRoomModel.findOne({
+      members: { $all: [userId1, userId2] },
+    });
+    if (!chatRoom) {
+      res.status(400).send("Not found chat room with room id");
+      return;
+    }
+    res.status(200).json({
+      message: "Get chat room success !",
+      data: chatRoom._id,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .send("An error occurred while fetch chat room id information.");
     return;
   }
 };
