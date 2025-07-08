@@ -1,6 +1,6 @@
 import express from "express";
 
-import { getLoggedInUserInfo, getProfileInfo } from "../controllers/users";
+import { getLoggedInUserInfo, getProfileInfo, updateUserInfo } from "../controllers/users";
 import { authenticateToken } from "../middlewares/index";
 
 export default (router: express.Router): void => {

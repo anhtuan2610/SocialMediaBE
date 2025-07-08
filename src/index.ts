@@ -8,7 +8,9 @@ import mongoose from "mongoose";
 import router from "./router"; // Nếu bạn import từ một thư mục mà không chỉ định tệp, Node.js sẽ mặc định tìm tệp index trong thư mục đó
 import dotenv from "dotenv";
 import { configureSocket } from "./socket/socket";
+import swaggerUi from "swagger-ui-express";
 
+import swaggerJsdoc from "swagger-jsdoc";
 // Load biến môi trường từ file .env
 dotenv.config();
 
@@ -48,5 +50,21 @@ mongoose
 mongoose.connection.on("error", (error: Error) => console.log(error));
 
 app.use("/api", router());
+
+const options = {
+  definition: {
+    openapi: "3.0.0", // phiên bản OpenAPI (trước đó là swagger: '2.0')
+    info: {
+      title: "Tên API của bạn",
+      version: "1.0.0",
+      description: "Mô tả API của bạn",
+    },
+  },
+  apis: ["./routes/*.js"], // Đường dẫn đến các tệp định nghĩa các route của bạn
+};
+
+const specs = swaggerJsdoc(options);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 export default app;

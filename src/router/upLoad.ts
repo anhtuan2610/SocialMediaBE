@@ -1,18 +1,35 @@
-// import { upLoadImage } from "../controllers/upLoad";
-// import express from "express";
-// import { authenticateToken, uploadImage } from "../middlewares";
-// import multer from "multer";
+import {
+  uploadAvatar,
+  uploadPostImage,
+  uploadMessageImage,
+  createPostWithImage,
+  createMessageWithImage,
+} from "../controllers/upLoad";
+import express from "express";
+import { authenticateToken, uploadImageMiddleware } from "../middlewares";
 
-// // const upload = multer({ dest: "uploads/" }); // multer chỉ đảm nhận vai trò xử lý file,
-// // // còn tất cả loại dữ liệu text trong formdata, Express có thể tự xử lý ngay cả khi không có multer
+export default (router: express.Router): void => {
+  // Upload avatar cho user
+  router.post(
+    "/upload/avatar",
+    authenticateToken,
+    uploadImageMiddleware,
+    uploadAvatar
+  );
 
-// export default (router: express.Router): void => {
-//   router.post(
-//     "/upload/uploadImage",
-//     authenticateToken,
-//     uploadImage,
-//     // upload.single("image"), //  nghĩa là multer sẽ tìm trong req một trường có tên "image" trong multipart/form-data request. // Nếu request gửi theo dạng multipart/form-data,
-//     // // ngoài file upload, các trường khác vẫn sẽ được Express xử lý bình thường và giữ trong req.body
-//     upLoadImage
-//   ); // trung gian lưu ảnh vào thư mục tạm thời uploads (có thể chọn các cách lưu tạm thời khác nhau)
-// };
+  // Tạo post với ảnh (mới)
+  router.post(
+    "/upload/create-post-with-image",
+    authenticateToken,
+    uploadImageMiddleware,
+    createPostWithImage
+  );
+
+  // Tạo message với ảnh (mới)
+  router.post(
+    "/upload/create-message-with-image",
+    authenticateToken,
+    uploadImageMiddleware,
+    createMessageWithImage
+  );
+};

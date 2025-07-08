@@ -27,7 +27,9 @@ export const register = async (req: express.Request, res: express.Response) => {
         password: authentication(salt, password),
       },
     });
-    res.status(200).json(user);
+    const returnedUser = user.toObject();
+    delete returnedUser.authentication;
+    res.status(200).json(returnedUser);
     return;
   } catch (error) {
     res.sendStatus(400);

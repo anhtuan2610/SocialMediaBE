@@ -1,0 +1,322 @@
+openapi: 3.0.0
+info:
+  title: Social Media Upload API
+  version: 1.0.0
+  description: API upload ảnh cho avatar, post và message
+
+servers:
+  - url: http://localhost:3000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UploadAvatarResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Avatar uploaded successfully
+        imageUrl:
+          type: string
+          example: https://res.cloudinary.com/...
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            avatar:
+              type: string
+    UploadPostImageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Post image uploaded successfully
+        imageUrl:
+          type: string
+        post:
+          type: object
+          properties:
+            id:
+              type: string
+            mediaUrl:
+              type: string
+    UploadMessageImageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Message image uploaded successfully
+        imageUrl:
+          type: string
+        messageData:
+          type: object
+          properties:
+            id:
+              type: string
+            mediaUrl:
+              type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+
+security:
+  - bearerAuth: []
+
+paths:
+  /upload/avatar:
+    post:
+      summary: Upload avatar cho user đang đăng nhập
+      description: Upload avatar cho user hiện tại (lấy user ID từ JWT token)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: File ảnh avatar
+      responses:
+        '200':
+          description: Upload thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadAvatarResponse'
+        '400':
+          description: Thiếu file hoặc lỗi upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Token không hợp lệ
+        '500':
+          description: Internal server error
+
+  /upload/create-post-with-image:
+    post:
+      summary: Tạo post với ảnh
+      description: Tạo post mới với ảnh (không cần postId)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+                - content
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: File ảnh cho post
+                content:
+                  type: string
+                  description: Nội dung post
+                title:
+                  type: string
+                  description: Tiêu đề post (optional)
+                location:
+                  type: string
+                  description: Vị trí (optional)
+      responses:
+        '201':
+          description: Post được tạo thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Post created successfully
+                  post:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      content:
+                        type: string
+                      title:
+                        type: string
+                      mediaUrl:
+                        type: string
+                      location:
+                        type: string
+                      author:
+                        type: string
+                      createdAt:
+                        type: string
+        '400':
+          description: Thiếu trường bắt buộc
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /upload/create-message-with-image:
+    post:
+      summary: Tạo message với ảnh
+      description: Tạo message mới với ảnh (không cần messageId)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+                - content
+                - chatRoomId
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: File ảnh cho message
+                content:
+                  type: string
+                  description: Nội dung message
+                chatRoomId:
+                  type: string
+                  description: ID của chat room
+      responses:
+        '201':
+          description: Message được tạo thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Message created successfully
+                  messageData:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      content:
+                        type: string
+                      mediaUrl:
+                        type: string
+                      messageType:
+                        type: string
+                      sender:
+                        type: string
+                      chatRoom:
+                        type: string
+                      createdAt:
+                        type: string
+        '400':
+          description: Thiếu trường bắt buộc
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /upload/post-image:
+    post:
+      summary: Upload ảnh cho post (cách cũ)
+      description: Upload ảnh cho một post đã tồn tại (cần postId)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+                - postId
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: File ảnh cho post
+                postId:
+                  type: string
+                  description: ID của post cần upload ảnh
+      responses:
+        '200':
+          description: Upload thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadPostImageResponse'
+        '400':
+          description: Thiếu trường hoặc lỗi upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Post not found
+        '500':
+          description: Internal server error
+
+  /upload/message-image:
+    post:
+      summary: Upload ảnh cho message (cách cũ)
+      description: Upload ảnh cho một message đã tồn tại (cần messageId)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+                - messageId
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: File ảnh cho message
+                messageId:
+                  type: string
+                  description: ID của message cần upload ảnh
+      responses:
+        '200':
+          description: Upload thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadMessageImageResponse'
+        '400':
+          description: Thiếu trường hoặc lỗi upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Message not found
+        '500':
+          description: Internal server error 
