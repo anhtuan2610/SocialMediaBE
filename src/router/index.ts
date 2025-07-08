@@ -4,8 +4,7 @@ import authentication from "./authentication";
 import users from "./users";
 import chatRooms from "./chatRooms";
 import messages from "./messages";
-import upLoad from "./upLoad";
-
+import { PostRouter } from "./posts";
 const router = express.Router();
 
 export default (): express.Router => {
@@ -13,6 +12,6 @@ export default (): express.Router => {
   users(router);
   chatRooms(router);
   messages(router);
-  upLoad(router);
+  PostRouter(router);
   return router;
 };
