@@ -5,7 +5,6 @@ import users from "./users";
 import chatRooms from "./chatRooms";
 import messages from "./messages";
 import { PostRouter } from "./posts";
-import upload from "./upLoad";
 
 const router = express.Router();
 
@@ -15,6 +14,5 @@ export default (): express.Router => {
   chatRooms(router);
   messages(router);
   PostRouter(router);
-  upload(router);
   return router;
 };

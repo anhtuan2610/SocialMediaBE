@@ -6,6 +6,10 @@ type CustomRequest = express.Request & {
     id: string;
     email: string;
   };
+  uploadResult?: {
+    secure_url: string;
+    public_id: string;
+  };
 };
 
 export const getLoggedInUserInfo = async (
@@ -60,7 +64,6 @@ export const getProfileInfo = async (
     res.status(500).send("An error occurred while fetching user info.");
     return;
   }
-
 };
 
 export const updateUserInfo = async (
@@ -74,18 +77,19 @@ export const updateUserInfo = async (
       return;
     }
 
-    const { name, email, bio } = req.body;
+    const { fullName, bio } = req.body;
     const updateData: any = {};
-    
-    if (name) updateData.name = name;
-    if (email) updateData.email = email;
-    if (bio) updateData.bio = bio;
 
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true }
-    );
+    if (fullName) updateData.fullName = fullName;
+    if (bio) updateData.bio = bio;
+    // Nếu có uploadResult (tức là có upload avatar)
+    if (req.uploadResult && req.uploadResult.secure_url) {
+      updateData.avatar = req.uploadResult.secure_url;
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
 
     if (!updatedUser) {
       res.status(404).json({ message: "User not found" });
@@ -94,7 +98,7 @@ export const updateUserInfo = async (
 
     res.status(200).json({
       message: "User information updated successfully",
-      user: updatedUser
+      user: updatedUser,
     });
   } catch (error) {
     console.error("Update user info error:", error);
